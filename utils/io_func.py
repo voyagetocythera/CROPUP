@@ -243,17 +243,25 @@ def record_process(list,record_file):
         for i in list:  # content into txt
             f.writelines(i + '\n')
         f.close()
+
+#把目录保存成Excel
 def save_dict_to_excel_whole(mydict, path):
-    #save dict to multi-sheet
+    #如果path的后缀不是xlsx，则终止
     _assert_suffix_match("xlsx", path)
+    #创建父目录
     make_parent_dir(path)
-    write = pd.ExcelWriter(path)
-    key=np.asarray(mydict.keys()).reshape(-1,1)
-    value=np.asarray(mydict.values()).reshape(-1,1)
-    all_data=np.concatenate((key,value),axis=1)
-    pd_i=pd.DataFrame(all_data)
-    pd_i.to_excel(write,index=False)
-    write.save()
+    
+    #提取目录中的键，每个键为一行
+    key = np.asarray(list(mydict.keys())).reshape(-1, 1)
+    #提取目录中的值，每个值为一行
+    value = np.asarray(list(mydict.values())).reshape(-1, 1)
+    #按列重组为二维数组
+    all_data = np.concatenate((key, value), axis=1)
+    #把二维数组转换为DataFrame
+    df = pd.DataFrame(all_data)  # Create the DataFrame directly
+	#保存到Excel,保存文件
+    with pd.ExcelWriter(path, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
 # if __name__ == "__main__":
 #     rootpath="/home/ll20/data/2021hubei_SAR_1/hubei"
 #     file=list_all_files(rootpath)
